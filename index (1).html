@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Software FJ – Sistema Integral de Gestión</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c0f;
+    --surface: #111318;
+    --surface2: #181c23;
+    --border: #252a35;
+    --accent: #4f8eff;
+    --accent2: #a78bfa;
+    --accent3: #34d399;
+    --accent4: #fb923c;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --danger: #f87171;
+    --success: #34d399;
+    --warn: #fbbf24;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(10,12,15,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem; height: 56px;
+  }
+  .nav-logo {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600; font-size: 14px; color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+  .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+  .nav-links a {
+    color: var(--muted); text-decoration: none; font-size: 13px;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    background: var(--accent); color: #fff;
+    padding: 6px 16px; border-radius: 6px;
+    font-size: 13px; font-weight: 600; text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .nav-cta:hover { opacity: 0.85; }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 6rem 2rem 4rem;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 50% 0%, rgba(79,142,255,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 80% 60%, rgba(167,139,250,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(79,142,255,0.1); border: 1px solid rgba(79,142,255,0.3);
+    color: var(--accent); font-size: 12px; font-family: 'IBM Plex Mono', monospace;
+    padding: 4px 14px; border-radius: 20px; margin-bottom: 1.5rem;
+    letter-spacing: 0.08em;
+  }
+  .badge::before { content: '●'; font-size: 8px; }
+  h1 {
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 700; line-height: 1.15;
+    background: linear-gradient(135deg, #fff 0%, #a0aec0 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+  }
+  h1 span { color: var(--accent); -webkit-text-fill-color: var(--accent); }
+  .hero-sub {
+    color: var(--muted); font-size: 1.05rem; max-width: 580px;
+    margin: 0 auto 2.5rem; font-weight: 300;
+  }
+  .hero-buttons { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .btn-primary {
+    background: var(--accent); color: #fff;
+    padding: 12px 28px; border-radius: 8px; text-decoration: none;
+    font-weight: 600; font-size: 14px; transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 0 0 0 rgba(79,142,255,0);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(79,142,255,0.35); }
+  .btn-outline {
+    border: 1px solid var(--border); color: var(--text);
+    padding: 12px 28px; border-radius: 8px; text-decoration: none;
+    font-size: 14px; transition: border-color 0.2s, background 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--muted); background: var(--surface); }
+
+  /* ─── TERMINAL HERO ─── */
+  .terminal-wrap {
+    width: 100%; max-width: 700px; margin: 3.5rem auto 0;
+    border-radius: 12px; overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .term-bar {
+    background: #1c2028; padding: 10px 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #febc2e; }
+  .dot-g { background: #28c840; }
+  .term-title { color: var(--muted); font-size: 12px; margin-left: auto; font-family: 'IBM Plex Mono', monospace; }
+  .term-body {
+    background: #0d1117;
+    padding: 20px 24px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px; line-height: 1.8;
+    text-align: left;
+  }
+  .t-cmd { color: #7dd3fc; }
+  .t-ok { color: var(--success); }
+  .t-err { color: var(--danger); }
+  .t-warn { color: var(--warn); }
+  .t-dim { color: #4b5563; }
+  .t-accent { color: var(--accent2); }
+  .t-sep { color: #374151; }
+
+  /* ─── SECTIONS ─── */
+  section { padding: 5rem 2rem; }
+  .container { max-width: 1000px; margin: 0 auto; }
+  .section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--accent); letter-spacing: 0.15em;
+    text-transform: uppercase; margin-bottom: 0.75rem;
+  }
+  .section-title {
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 700; margin-bottom: 1rem; color: #fff;
+  }
+  .section-sub { color: var(--muted); max-width: 560px; margin-bottom: 3rem; }
+
+  /* ─── CARDS GRID ─── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.5rem;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .card-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; margin-bottom: 1rem;
+  }
+  .card h3 { font-size: 16px; font-weight: 600; margin-bottom: 0.4rem; color: #fff; }
+  .card p { color: var(--muted); font-size: 13.5px; line-height: 1.6; }
+
+  /* ─── PRINCIPIOS OOP ─── */
+  .oop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .oop-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+  }
+  .oop-header {
+    padding: 14px 20px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .oop-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; font-weight: 600; padding: 3px 10px;
+    border-radius: 4px; letter-spacing: 0.05em;
+  }
+  .tag-abs { background: rgba(167,139,250,0.15); color: var(--accent2); }
+  .tag-her { background: rgba(79,142,255,0.15); color: var(--accent); }
+  .tag-pol { background: rgba(52,211,153,0.15); color: var(--accent3); }
+  .tag-enc { background: rgba(251,146,60,0.15); color: var(--accent4); }
+  .tag-exc { background: rgba(248,113,113,0.15); color: var(--danger); }
+  .tag-sob { background: rgba(251,191,36,0.15); color: var(--warn); }
+  .oop-body { padding: 16px 20px; }
+  .oop-body code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px; color: #c9d1d9; line-height: 1.9;
+    display: block; white-space: pre;
+    overflow-x: auto;
+  }
+
+  /* ─── OPERACIONES TABLE ─── */
+  .ops-table { width: 100%; border-collapse: collapse; }
+  .ops-table th {
+    text-align: left; padding: 12px 16px;
+    font-size: 12px; font-weight: 600; color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+  }
+  .ops-table td { padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid rgba(37,42,53,0.6); }
+  .ops-table tr:last-child td { border-bottom: none; }
+  .ops-table tr:hover td { background: var(--surface2); }
+  .status {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 5px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .status-ok { background: rgba(52,211,153,0.12); color: var(--success); }
+  .status-err { background: rgba(248,113,113,0.12); color: var(--danger); }
+  .num { color: var(--muted); font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+
+  /* ─── EXCEPCIONES ─── */
+  .exc-list { display: grid; gap: 10px; }
+  .exc-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--danger);
+    border-radius: 0 8px 8px 0; padding: 12px 16px;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .exc-code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; background: rgba(248,113,113,0.12);
+    color: var(--danger); padding: 2px 8px; border-radius: 4px;
+    white-space: nowrap; margin-top: 2px;
+  }
+  .exc-name { font-weight: 600; font-size: 14px; color: #fff; margin-bottom: 2px; }
+  .exc-desc { color: var(--muted); font-size: 13px; }
+
+  /* ─── ESTRUCTURA ─── */
+  .file-tree {
+    background: #0d1117; border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px 24px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+    line-height: 2;
+  }
+  .ft-dir { color: var(--accent); }
+  .ft-file { color: var(--text); }
+  .ft-py { color: #a78bfa; }
+  .ft-md { color: #34d399; }
+  .ft-log { color: #fbbf24; }
+  .ft-comment { color: #4b5563; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid var(--border); padding: 2rem;
+    text-align: center; color: var(--muted); font-size: 13px;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* ─── DIVIDER ─── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+  @media (max-width: 600px) {
+    nav { padding: 0 1rem; }
+    .nav-links { display: none; }
+    section { padding: 3.5rem 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">◈ Software FJ</div>
+  <ul class="nav-links">
+    <li><a href="#servicios">Servicios</a></li>
+    <li><a href="#oop">Principios OOP</a></li>
+    <li><a href="#operaciones">Simulación</a></li>
+    <li><a href="#excepciones">Excepciones</a></li>
+  </ul>
+  <a href="https://github.com/issues/recent" class="nav-cta" target="_blank">Ver en GitHub →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="badge">Python 3.10+ · Sin base de datos · OOP Puro</div>
+  <h1>Sistema Integral de<br><span>Software FJ</span></h1>
+  <p class="hero-sub">
+    Gestión de clientes, servicios y reservas orientada a objetos.
+    Abstracción · Herencia · Polimorfismo · Encapsulación · Excepciones avanzadas.
+  </p>
+  <div class="hero-buttons">
+    <a href="https://github.com/issues/recent" class="btn-primary" target="_blank">Ver repositorio en GitHub</a>
+    <a href="#operaciones" class="btn-outline">Ver simulación</a>
+  </div>
+
+  <!-- Terminal animada -->
+  <div class="terminal-wrap">
+    <div class="term-bar">
+      <div class="dot dot-r"></div>
+      <div class="dot dot-y"></div>
+      <div class="dot dot-g"></div>
+      <div class="term-title">python main.py</div>
+    </div>
+    <div class="term-body">
+<span class="t-sep">╔══════════════════════════════════════════════════════╗</span>
+<span class="t-sep">║    </span><span class="t-cmd">SOFTWARE FJ – Sistema Integral de Gestión        </span><span class="t-sep">║</span>
+<span class="t-sep">╚══════════════════════════════════════════════════════╝</span>
+
+<span class="t-dim">── REGISTRO DE CLIENTES ────────────────────────────────</span>
+<span class="t-ok">[OK]</span> Cliente(nombre=<span class="t-accent">'Ana García'</span>, email=<span class="t-accent">'ana@email.com'</span>)
+<span class="t-ok">[OK]</span> Cliente(nombre=<span class="t-accent">'Carlos Pérez'</span>, email=<span class="t-accent">'carlos@empresa.com'</span>)
+<span class="t-err">[ERR]</span> ClienteInvalidoError: email <span class="t-accent">'correo-invalido'</span> → formato inválido
+<span class="t-err">[ERR]</span> ClienteInvalidoError: nombre <span class="t-accent">''</span> → no puede estar vacío
+
+<span class="t-dim">── GESTIÓN DE RESERVAS ─────────────────────────────────</span>
+<span class="t-ok">[OK]</span> Reserva confirmada │ Sala Ejecutiva A │ 3h │ <span class="t-accent">$180,000</span>
+<span class="t-ok">[OK]</span> Reserva confirmada │ Consultoría Cloud │ 2h │ <span class="t-accent">$300,000</span>
+<span class="t-warn">[WARN]</span> Reserva cancelada │ CC878625 → CANCELADA
+<span class="t-err">[ERR]</span> ReservaInvalidaError: duración negativa → <span class="t-accent">-2</span>
+
+<span class="t-dim">── TOTAL FACTURADO ─────────────────────────────────────</span>
+<span class="t-ok">💰</span> Total facturado: <span class="t-accent">$800,000 COP</span>
+<span class="t-ok">✔</span> Logs guardados en: <span class="t-accent">logs/sistema.log</span>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SERVICIOS -->
+<section id="servicios">
+  <div class="container">
+    <div class="section-label">Módulo de Servicios</div>
+    <h2 class="section-title">Tres tipos de servicios especializados</h2>
+    <p class="section-sub">Cada servicio hereda de la clase abstracta <code style="color:var(--accent2)">Servicio</code> e implementa <code style="color:var(--accent2)">calcular_costo()</code> y <code style="color:var(--accent2)">describir()</code> de manera polimórfica.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon" style="background:rgba(79,142,255,0.1)">🏛️</div>
+        <h3>Sala de Reunión</h3>
+        <p>Reserva por horas con precio base de $50.000 COP/h. Suplemento automático para grupos de más de 5 personas. Validación de capacidad máxima.</p>
+        <div style="margin-top:1rem; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted)">
+          <span style="color:var(--accent)">calcular_costo</span>(horas, descuento, impuesto)
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background:rgba(167,139,250,0.1)">💻</div>
+        <h3>Alquiler de Equipos</h3>
+        <p>Laptops ($25k), proyectores ($15k) y servidores ($80k) por unidad/hora. Soporta múltiples unidades simultáneas. Validación de tipo de equipo.</p>
+        <div style="margin-top:1rem; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted)">
+          precio_hora × cantidad × horas
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background:rgba(52,211,153,0.1)">🎓</div>
+        <h3>Asesoría Técnica</h3>
+        <p>Tarifas por nivel del asesor: Junior ($80k), Senior ($150k), Expert ($250k). Especificación de área temática. Soporte para descuentos e IVA.</p>
+        <div style="margin-top:1rem; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted)">
+          tarifa_nivel × horas
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- OOP -->
+<section id="oop">
+  <div class="container">
+    <div class="section-label">Arquitectura OOP</div>
+    <h2 class="section-title">Cinco principios aplicados rigurosamente</h2>
+    <p class="section-sub">El sistema demuestra cada pilar de la programación orientada a objetos con ejemplos concretos en el código.</p>
+    <div class="oop-grid">
+
+      <div class="oop-card">
+        <div class="oop-header">
+          <span class="oop-tag tag-abs">Abstracción</span>
+          <span style="color:var(--muted);font-size:13px">EntidadBase · Servicio</span>
+        </div>
+        <div class="oop-body">
+<code>class Servicio(EntidadBase):
+  @abstractmethod
+  def calcular_costo(self, horas,
+    descuento=0.0, impuesto=0.0):
+    ...
+  @abstractmethod
+  def describir(self) -> str:
+    ...</code>
+        </div>
+      </div>
+
+      <div class="oop-card">
+        <div class="oop-header">
+          <span class="oop-tag tag-her">Herencia</span>
+          <span style="color:var(--muted);font-size:13px">3 subclases de Servicio</span>
+        </div>
+        <div class="oop-body">
+<code>EntidadBase
+  └── Servicio (ABC)
+        ├── SalaReunion
+        ├── AlquilerEquipo
+        └── AsesoriaTecnica</code>
+        </div>
+      </div>
+
+      <div class="oop-card">
+        <div class="oop-header">
+          <span class="oop-tag tag-pol">Polimorfismo</span>
+          <span style="color:var(--muted);font-size:13px">Mismo método, distintos resultados</span>
+        </div>
+        <div class="oop-body">
+<code>for srv in [sala, equipo, asesoría]:
+  print(srv.describir())
+  # → comportamiento único
+  # por tipo de servicio</code>
+        </div>
+      </div>
+
+      <div class="oop-card">
+        <div class="oop-header">
+          <span class="oop-tag tag-enc">Encapsulación</span>
+          <span style="color:var(--muted);font-size:13px">Atributos privados + propiedades</span>
+        </div>
+        <div class="oop-body">
+<code>@email.setter
+def email(self, valor):
+  if not PATRON.match(valor):
+    raise ClienteInvalidoError(
+      "email", valor,
+      "formato inválido")</code>
+        </div>
+      </div>
+
+      <div class="oop-card">
+        <div class="oop-header">
+          <span class="oop-tag tag-sob">Sobrecarga</span>
+          <span style="color:var(--muted);font-size:13px">Parámetros opcionales</span>
+        </div>
+        <div class="oop-body">
+<code>sala.calcular_costo(2)
+sala.calcular_costo(2, descuento=0.10)
+sala.calcular_costo(2, impuesto=0.19)
+sala.calcular_costo(2,
+  descuento=0.10, impuesto=0.19)</code>
+        </div>
+      </div>
+
+      <div class="oop-card">
+        <div class="oop-header">
+          <span class="oop-tag tag-exc">Excepciones</span>
+          <span style="color:var(--muted);font-size:13px">try/except/else/finally + chain</span>
+        </div>
+        <div class="oop-body">
+<code>try:
+  reserva.confirmar()
+except ReservaInvalidaError as e:
+  logger.error(str(e))
+else:
+  logger.info("Confirmada ✓")
+finally:
+  logger.info("Intento procesado")</code>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- OPERACIONES -->
+<section id="operaciones">
+  <div class="container">
+    <div class="section-label">Simulación</div>
+    <h2 class="section-title">14 operaciones completas demostradas</h2>
+    <p class="section-sub">El sistema ejecuta registros válidos e inválidos, reservas exitosas y fallidas, confirmaciones y cancelaciones.</p>
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden;">
+      <table class="ops-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Operación</th>
+            <th>Tipo</th>
+            <th>Resultado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="num">01</td><td>Registrar cliente válido (Ana García)</td><td style="color:var(--muted);font-size:13px">Cliente</td><td><span class="status status-ok">✔ OK</span></td></tr>
+          <tr><td class="num">02</td><td>Registrar cliente válido (Carlos Pérez)</td><td style="color:var(--muted);font-size:13px">Cliente</td><td><span class="status status-ok">✔ OK</span></td></tr>
+          <tr><td class="num">03</td><td>Cliente con email inválido</td><td style="color:var(--muted);font-size:13px">Validación</td><td><span class="status status-err">✖ ClienteInvalidoError</span></td></tr>
+          <tr><td class="num">04</td><td>Cliente con nombre vacío</td><td style="color:var(--muted);font-size:13px">Validación</td><td><span class="status status-err">✖ ClienteInvalidoError</span></td></tr>
+          <tr><td class="num">05</td><td>Crear Sala Ejecutiva A (cap. 10)</td><td style="color:var(--muted);font-size:13px">Servicio</td><td><span class="status status-ok">✔ OK</span></td></tr>
+          <tr><td class="num">06</td><td>Crear Alquiler Laptop Dell (×5)</td><td style="color:var(--muted);font-size:13px">Servicio</td><td><span class="status status-ok">✔ OK</span></td></tr>
+          <tr><td class="num">07</td><td>Crear Asesoría Cloud AWS – Senior</td><td style="color:var(--muted);font-size:13px">Servicio</td><td><span class="status status-ok">✔ OK</span></td></tr>
+          <tr><td class="num">08</td><td>Sala con capacidad negativa (−5)</td><td style="color:var(--muted);font-size:13px">Validación</td><td><span class="status status-err">✖ ServicioNoDisponibleError</span></td></tr>
+          <tr><td class="num">09</td><td>Reservar sala 3 horas → confirmar</td><td style="color:var(--muted);font-size:13px">Reserva</td><td><span class="status status-ok">✔ $180.000</span></td></tr>
+          <tr><td class="num">10</td><td>Reservar asesoría 2 horas → confirmar + IVA</td><td style="color:var(--muted);font-size:13px">Reserva</td><td><span class="status status-ok">✔ $357.000</span></td></tr>
+          <tr><td class="num">11</td><td>Cancelar reserva de sala</td><td style="color:var(--muted);font-size:13px">Ciclo vida</td><td><span class="status status-ok">✔ Cancelada</span></td></tr>
+          <tr><td class="num">12</td><td>Reservar equipo con duración −2h</td><td style="color:var(--muted);font-size:13px">Validación</td><td><span class="status status-err">✖ ReservaInvalidaError</span></td></tr>
+          <tr><td class="num">13</td><td>Reservar sin cliente (None)</td><td style="color:var(--muted);font-size:13px">Validación</td><td><span class="status status-err">✖ ParametroFaltanteError</span></td></tr>
+          <tr><td class="num">14</td><td>Comparación polimórfica de los 3 servicios</td><td style="color:var(--muted);font-size:13px">Polimorfismo</td><td><span class="status status-ok">✔ OK</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- EXCEPCIONES -->
+<section id="excepciones">
+  <div class="container">
+    <div class="section-label">Manejo de Errores</div>
+    <h2 class="section-title">Jerarquía de excepciones personalizadas</h2>
+    <p class="section-sub">Todas heredan de <code style="color:var(--accent2)">SoftwareFJError</code>. Cada error tiene código único, mensaje descriptivo y se registra automáticamente en el log.</p>
+    <div class="exc-list">
+      <div class="exc-item">
+        <div><div class="exc-code">1001</div></div>
+        <div><div class="exc-name">ClienteInvalidoError</div><div class="exc-desc">Email malformado, nombre vacío o teléfono con formato incorrecto.</div></div>
+      </div>
+      <div class="exc-item">
+        <div><div class="exc-code">2001</div></div>
+        <div><div class="exc-name">ServicioNoDisponibleError</div><div class="exc-desc">Servicio con parámetros incorrectos o fuera de operación.</div></div>
+      </div>
+      <div class="exc-item">
+        <div><div class="exc-code">2002</div></div>
+        <div><div class="exc-name">CapacidadExcedidaError</div><div class="exc-desc">Número de asistentes supera el límite de la sala reservada.</div></div>
+      </div>
+      <div class="exc-item">
+        <div><div class="exc-code">2003</div></div>
+        <div><div class="exc-name">CostoInconsistenteError</div><div class="exc-desc">Cálculo de precio produce resultado negativo, infinito o NaN.</div></div>
+      </div>
+      <div class="exc-item">
+        <div><div class="exc-code">3001</div></div>
+        <div><div class="exc-name">ReservaInvalidaError</div><div class="exc-desc">Duración negativa, cambio de estado no permitido o servicio ya cancelado.</div></div>
+      </div>
+      <div class="exc-item">
+        <div><div class="exc-code">4001</div></div>
+        <div><div class="exc-name">ParametroFaltanteError</div><div class="exc-desc">Argumento obligatorio enviado como None u omitido en la llamada.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ESTRUCTURA -->
+<section>
+  <div class="container">
+    <div class="section-label">Estructura del Proyecto</div>
+    <h2 class="section-title">Organización modular del código</h2>
+    <p class="section-sub">Cada módulo tiene una responsabilidad única. Sin dependencias externas.</p>
+    <div class="file-tree">
+<span class="ft-dir">software_fj/</span>
+│
+├── <span class="ft-py">main.py</span>        <span class="ft-comment"># Punto de entrada · simula 14 operaciones</span>
+├── <span class="ft-py">clientes.py</span>    <span class="ft-comment"># EntidadBase (ABC) · clase Cliente encapsulada</span>
+├── <span class="ft-py">servicios.py</span>   <span class="ft-comment"># Servicio (ABC) · SalaReunion · AlquilerEquipo · Asesoría</span>
+├── <span class="ft-py">reservas.py</span>    <span class="ft-comment"># Clase Reserva · GestorReservas · ciclo de vida</span>
+├── <span class="ft-py">exceptions.py</span>  <span class="ft-comment"># 6 excepciones personalizadas con códigos únicos</span>
+├── <span class="ft-py">logger.py</span>      <span class="ft-comment"># Registro de eventos INFO · WARNING · ERROR · CRITICAL</span>
+├── <span class="ft-md">README.md</span>      <span class="ft-comment"># Documentación completa del proyecto</span>
+└── <span class="ft-dir">logs/</span>
+    └── <span class="ft-log">sistema.log</span>  <span class="ft-comment"># Generado automáticamente · nunca se sube al repo</span>
+    </div>
+
+    <div style="margin-top:2rem; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1.5rem;">
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--muted); margin-bottom:0.75rem;"># Cómo ejecutar</div>
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:14px; line-height:2.2;">
+        <span style="color:var(--accent)">$</span> <span style="color:#e8eaf0">git clone https://github.com/TU_USUARIO/software-fj.git</span><br>
+        <span style="color:var(--accent)">$</span> <span style="color:#e8eaf0">cd software-fj</span><br>
+        <span style="color:var(--accent)">$</span> <span style="color:#e8eaf0">python main.py</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>Desarrollado por <strong style="color:var(--text)">Jeison Cardona</strong> · Programación · Universidad Nacional Abierta y a Distancia UNAD · 2026</p>
+  <p style="margin-top:0.4rem">
+    <a href="https://github.com/issues/recent" target="_blank">GitHub</a>
+    &nbsp;·&nbsp;
+    <span>Python 3.10+</span>
+    &nbsp;·&nbsp;
+    <span>Sin base de datos</span>
+  </p>
+</footer>
+
+</body>
+</html>
